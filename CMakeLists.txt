@@ -15,6 +15,7 @@ find_package(cv_bridge REQUIRED)
 # 2. 编译 Controller 库
 add_library(${PROJECT_NAME} SHARED
   src/test_mock_camera_controller.cpp
+  src/test_mock_many_cameras_controller.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

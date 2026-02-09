@@ -6,4 +6,15 @@
       Controller for testing and verifying perception data pointers.
     </description>
   </class>
+
+  <class name="perception_controller/TestMockManyCamerasController"
+         type="perception_controller::TestMockManyCamerasController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Controller for testing many cameras and verifying perception data pointers.
+    </description>
+  </class>
 </library>
+
+
+  
