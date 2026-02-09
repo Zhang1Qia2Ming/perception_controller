@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>perception_controller</name>
+  <version>0.1.0</version>
+  <description>Test controller to verify Orin perception hardware pointer passing.</description>
+  <maintainer email="test@test.com">test</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>controller_interface</depend>
+  <depend>hardware_interface</depend>
+  <depend>pluginlib</depend>
+  <depend>sensor_msgs</depend>
+  <depend>perception_hardware</depend>
+  <depend>OpenCV</depend>
+  <depend>cv_bridge</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <controller_interface plugin="${prefix}/perception_controller_plugins.xml"/>
+  </export>
+</package>

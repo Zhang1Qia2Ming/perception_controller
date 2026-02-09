@@ -1,0 +1,9 @@
+<library path="perception_controller">
+  <class name="perception_controller/TestMockCameraController"
+         type="perception_controller::TestMockCameraController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Controller for testing and verifying perception data pointers.
+    </description>
+  </class>
+</library>

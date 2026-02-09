@@ -1,0 +1,8 @@
+controller_manager:
+  ros__parameters:
+    update_frequency: 100.0
+    test_mock_camera_controller:
+      type: perception_controller/TestMockCameraController
+
+# test_mock_camera_controller:
+#   ros__parameters:
