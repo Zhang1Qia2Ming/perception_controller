@@ -3,6 +3,9 @@ controller_manager:
     update_frequency: 100.0
     test_mock_many_cameras_controller:
       type: perception_controller/TestMockManyCamerasController
+    
+    test_t265_camera_controller:
+      type: perception_controller/TestT265CameraController
 
 # test_mock_camera_controller:
 #   ros__parameters:

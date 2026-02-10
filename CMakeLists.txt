@@ -16,6 +16,7 @@ find_package(cv_bridge REQUIRED)
 add_library(${PROJECT_NAME} SHARED
   src/test_mock_camera_controller.cpp
   src/test_mock_many_cameras_controller.cpp
+  src/test_t265_camera_controller.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -31,6 +32,7 @@ ament_target_dependencies(${PROJECT_NAME}
   hardware_interface
   pluginlib
   sensor_msgs
+  geometry_msgs
   OpenCV
   cv_bridge
 )
