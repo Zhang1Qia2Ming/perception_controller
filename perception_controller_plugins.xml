@@ -22,6 +22,14 @@
       Controller for testing and verifying T265 camera data pointers.
     </description>
   </class>
+
+  <class name="perception_controller/PerceptionSystemController"
+         type="perception_controller::PerceptionSystemController"
+         base_class_type="controller_interface::ControllerInterface">
+    <description>
+      Controller for handling multiple perception devices and distributing data.
+    </description>
+  </class>
 </library>
 
 

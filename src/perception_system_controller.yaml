@@ -1,36 +1,40 @@
 perception_system_controller:
+  ros__parameters:
   devices:
     - t265_front
     - camera_front
   
   #
-  t265_front:
-    enable: true
-    device_type: "t265_camera"
-    interface_name: "t265_front/data_ptr"
-    frame_id: "t265_front_link"
-    width: 848
-    height: 800
-    topic_raw: "/perception/t265_front/raw"
-    topic_rect: "/perception/t265_front/rect"
-    
-    intrinsic_matrix: [848.0, 0.0, 424.0, 0.0, 848.0, 400.0, 0.0, 0.0, 1.0]
-    distortion: [0.0, 0.0, 0.0, 0.0, 0.0]
-    extrinsics: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  members:
+    t265_front:
+      enable: true
+      device_type: "t265_camera"
+      sensor_components: ["imu","pose","image","image"]
+      interface_name: "t265_front/data_ptr"
+      frame_id: "t265_front_link"
+      width: 848
+      height: 800
+      topic_raw: "/perception/t265_front/raw"
+      topic_rect: "/perception/t265_front/rect"
+      
+      intrinsic_matrix: [848.0, 0.0, 424.0, 0.0, 848.0, 400.0, 0.0, 0.0, 1.0]
+      distortion: [0.0, 0.0, 0.0, 0.0, 0.0]
+      extrinsics: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-  #
-  camera_front:
-    enable: true
-    device_type: "mock_camera"
-    interface_name: "camera_front/data_ptr"
-    frame_id: "camera_front_link"
-    width: 640
-    height: 480
-    topic_raw: "/perception/camera_front/raw"
-    topic_rect: "/perception/camera_front/rect"
+    #
+    camera_front:
+      enable: true
+      device_type: "mock_camera"
+      sensor_components: ["image"]
+      interface_name: "camera_front/data_ptr"
+      frame_id: "camera_front_link"
+      width: 640
+      height: 480
+      topic_raw: "/perception/camera_front/raw"
+      topic_rect: "/perception/camera_front/rect"
 
-    intrinsic_matrix: [640.0, 0.0, 320.0, 0.0, 640.0, 240.0, 0.0, 0.0, 1.0]
-    distortion: [0.0, 0.0, 0.0, 0.0, 0.0]
-    extrinsics: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      intrinsic_matrix: [640.0, 0.0, 320.0, 0.0, 640.0, 240.0, 0.0, 0.0, 1.0]
+      distortion: [0.0, 0.0, 0.0, 0.0, 0.0]
+      extrinsics: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 
