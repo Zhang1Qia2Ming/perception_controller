@@ -143,9 +143,23 @@ namespace perception_system_controller {
             // distrubute data
             if(member->device_type == "mock_camera")
             {
-                auto mock_camera_data = reinterpret_cast<perception_hardware::MockCameraData*>(ptr_address);
+                auto* mock_camera_data = reinterpret_cast<perception_hardware::MockCameraData*>(ptr_address);
 
+                if(!mock_camera_data || mock_camera_data->image.empty()) {
+                    continue;
+                }
+                // uint64_t hw_time = mock_camera_data->timestamp_nanos;
+                // auto now = get_node()->now().nanoseconds();
+                // RCLCPP_INFO(get_node()->get_logger(), "Time Delay: %ld ns", now - hw_time);
 
+                auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", mock_camera_data->image).toImageMsg();
+                msg->header.stamp = get_node()->now();
+                msg->header.frame_id = mock_camera_data->frame_id;
+                member->pub_image->publish(*msg);
+            }
+            else if(member->device_type == "t265_camera")
+            {
+                
             }
         }
     }
