@@ -4,6 +4,7 @@ perception_system_controller:
     default_value: ["t265_front", "camera_front"]
     description: "List of device names"
 
+
   members:
     __map_device_list:
       enable:
@@ -12,33 +13,18 @@ perception_system_controller:
       device_type:
         type: string
         default_value: "t265_camera"
-      sensor_components:
-        type: string_array
-        default_value: ["image", "pose", "imu"]
       interface_name:
         type: string
         default_value: ""
+      sensor_components:
+        type: string_array
+        default_value: ["image_fisheye0", "pose_pose", "imu_imu"]   # example image_fisheye0
       frame_id:
         type: string
         default_value: ""
-      width:
-        type: int
-        default_value: 848
-      height:
-        type: int
-        default_value: 800
-      topic_raw:
-        type: string
-        default_value: ""
-      topic_rect:
-        type: string
-        default_value: ""
-      topic_pose:
-        type: string
-        default_value: ""
-      topic_imu:
-        type: string
-        default_value: ""
+      # -- begin --
+      
+      # -- end --
       intrinsic_matrix:
         type: double_array
         default_value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

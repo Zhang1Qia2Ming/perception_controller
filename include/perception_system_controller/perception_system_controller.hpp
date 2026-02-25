@@ -56,12 +56,14 @@ class PerceptionSystemController : public controller_interface::ControllerInterf
             using ImuPub = rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Imu>::SharedPtr;
             using PosePub = rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PoseStamped>::SharedPtr;
             
-            ImagePub pub_raw;
-            ImagePub pub_rect;
-            ImuPub pub_imu;
-            PosePub pub_pose;
+            // name, publisher
+            std::map<std::string, ImagePub> pub_raw;
+            std::map<std::string, ImagePub> pub_rect;
+            std::map<std::string, ImuPub> pub_imu;
+            std::map<std::string, PosePub> pub_pose;
+
         };
-        void worker_thread(std::shared_ptr<BaseMember> member, size_t interface_idx);
+        void worker_thread(std::shared_ptr<BaseMember> member, size_t interface_idx, std::string type, std::string topic);
         
         std::vector<std::shared_ptr<BaseMember>> members_;
 
