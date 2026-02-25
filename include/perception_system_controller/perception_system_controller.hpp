@@ -18,7 +18,7 @@
 #include <perception_controller/perception_system_controller_params_lib.hpp>
 
 
-namespace perception_system_controller {
+namespace perception_controller {
 
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
@@ -65,19 +65,19 @@ class PerceptionSystemController : public controller_interface::ControllerInterf
         
         std::vector<std::shared_ptr<BaseMember>> members_;
 
-        std::shared_ptr<ParamListener> param_listener_;
-        Params params_;
+        std::shared_ptr<perception_system_controller::ParamListener> param_listener_;
+        perception_system_controller::Params params_;
 
         // about thread
         std::vector<std::thread> threads_;
         std::atomic<bool> is_running_{false};
 };
 
-} // namespace perception_system_controller
+} // namespace perception_controller
 
 #include "pluginlib/class_list_macros.hpp"
 
 PLUGINLIB_EXPORT_CLASS(
-    perception_system_controller::PerceptionSystemController, controller_interface::ControllerInterface)
+    perception_controller::PerceptionSystemController, controller_interface::ControllerInterface)
 
 #endif // PERCEPTION_CONTROLLER__PERCEPTION_SYSTEM_CONTROLLER_HPP_

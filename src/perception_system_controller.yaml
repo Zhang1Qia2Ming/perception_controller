@@ -1,6 +1,6 @@
 perception_system_controller:
   ros__parameters:
-  devices:
+  device_list:
     - t265_front
     - camera_front
   

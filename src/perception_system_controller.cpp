@@ -4,7 +4,7 @@
 
 #include <map>
 
-namespace perception_system_controller {
+namespace perception_controller {
     PerceptionSystemController::PerceptionSystemController() : controller_interface::ControllerInterface() {}
 
     controller_interface::CallbackReturn PerceptionSystemController::on_init()
@@ -164,4 +164,6 @@ namespace perception_system_controller {
         }
     }
 
-} // namespace perception_system_controller
+
+
+} // namespace perception_controller
