@@ -54,9 +54,9 @@ namespace perception_controller {
                             auto msg = std::make_unique<geometry_msgs::msg::PoseStamped>();
                             msg->header.stamp = time;
                             msg->header.frame_id = "test_odom";
-                            msg->pose.position.x = t265_camera_data->pose[0];
-                            msg->pose.position.y = t265_camera_data->pose[1];
-                            msg->pose.position.z = t265_camera_data->pose[2];
+                            msg->pose.position.x = t265_camera_data->pose.position[0];
+                            msg->pose.position.y = t265_camera_data->pose.position[1];
+                            msg->pose.position.z = t265_camera_data->pose.position[2];
                             pose_publisher_->publish(std::move(msg));
                         }                        
                     }

@@ -155,7 +155,7 @@ namespace perception_system_controller {
                 auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", mock_camera_data->image).toImageMsg();
                 msg->header.stamp = get_node()->now();
                 msg->header.frame_id = mock_camera_data->frame_id;
-                member->pub_image->publish(*msg);
+                member->pub_raw->publish(*msg);
             }
             else if(member->device_type == "t265_camera")
             {
