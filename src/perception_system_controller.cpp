@@ -153,12 +153,27 @@ namespace perception_controller {
     controller_interface::CallbackReturn PerceptionSystemController::on_deactivate(const rclcpp_lifecycle::State& previous_state)
     {
         is_running_ = false;
+
+        // join all threads
         for(auto & thread : threads_) {
             if(thread.joinable()) {
                 thread.join();
             }
         }
         threads_.clear();
+
+        // close all publishers
+        for(auto & member : members_) {
+            for(const auto & i : member->pub_raw) {
+                i.second->on_deactivate();
+            }
+            for(const auto & i : member->pub_pose) {
+                i.second->on_deactivate();
+            }
+            for(const auto & i : member->pub_imu) {
+                i.second->on_deactivate();
+            }
+        }
         
         return controller_interface::CallbackReturn::SUCCESS;
     }
