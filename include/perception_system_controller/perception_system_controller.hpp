@@ -16,13 +16,14 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <perception_controller/perception_system_controller_params_lib.hpp>
-
+#include "perception_system_controller/base_types.hpp"
 
 namespace perception_controller {
 
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 class PerceptionSystemController : public controller_interface::ControllerInterface {
+
     private:
         
     public:
@@ -42,27 +43,12 @@ class PerceptionSystemController : public controller_interface::ControllerInterf
 
         controller_interface::return_type update(
             const rclcpp::Time& time, const rclcpp::Duration& period) override;
-        
+    
+    public:
+
+          
     protected:
-        struct BaseMember {
-            std::string name;
-            std::string device_type;
-            std::vector<std::string> sensor_components;
-            std::string interface_name;
-            std::string frame_id;
-            bool enable = false;
-
-            using ImagePub = rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Image>::SharedPtr;
-            using ImuPub = rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Imu>::SharedPtr;
-            using PosePub = rclcpp_lifecycle::LifecyclePublisher<geometry_msgs::msg::PoseStamped>::SharedPtr;
-            
-            // name, publisher
-            std::map<std::string, ImagePub> pub_raw;
-            std::map<std::string, ImagePub> pub_rect;
-            std::map<std::string, ImuPub> pub_imu;
-            std::map<std::string, PosePub> pub_pose;
-
-        };
+        
         void worker_thread(std::shared_ptr<BaseMember> member, size_t interface_idx, std::string type, std::string topic);
         
         std::vector<std::shared_ptr<BaseMember>> members_;

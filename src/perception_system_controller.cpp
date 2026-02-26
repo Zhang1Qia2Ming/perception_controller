@@ -1,6 +1,8 @@
 #include "perception_system_controller/perception_system_controller.hpp"
 #include "mock_device/mock_camera_data.hpp"
+#include "perception_hardware/t265_camera_data.hpp"
 #include "controller_interface/helpers.hpp"
+#include "perception_system_controller/utils.hpp"
 
 #include <map>
 
@@ -19,6 +21,7 @@ namespace perception_controller {
             RCLCPP_ERROR(get_node()->get_logger(), "Exception thrown during controller's init with message: %s \n", e.what());
             return controller_interface::CallbackReturn::ERROR;
         }
+        
         return controller_interface::CallbackReturn::SUCCESS;
     }
 
@@ -61,7 +64,7 @@ namespace perception_controller {
                 else if (type == "imu")
                 {
                     member_ptr->pub_imu[topic] = get_node()->create_publisher<sensor_msgs::msg::Imu>(topic, 10);
-                }            
+                }
                 
             }
             members_.push_back(member_ptr);
@@ -77,15 +80,18 @@ namespace perception_controller {
         RCLCPP_INFO(get_node()->get_logger(), "PerceptionSystemController on_activate");
         is_running_ = true;
 
+        // debug print available state interfaces
+        for (const auto & si : state_interfaces_) {
+            RCLCPP_DEBUG(get_node()->get_logger(), "Available interface in controller: [%s]", 
+                        si.get_name().c_str());
+        }
+
         for(auto & member : members_) {
 
-            RCLCPP_INFO(get_node()->get_logger(), "Looking for: [%s], Enable status: %s", 
-                member->interface_name.c_str(), member->enable ? "true" : "false");
+            // RCLCPP_INFO(get_node()->get_logger(), "Looking for: [%s], Enable status: %s", 
+            //     member->interface_name.c_str(), member->enable ? "true" : "false");
 
-            for (const auto & si : state_interfaces_) {
-                RCLCPP_INFO(get_node()->get_logger(), "Available interface in controller: [%s]", 
-                            si.get_name().c_str());
-            }
+
             auto it = std::find_if(
                 state_interfaces_.begin(),
                 state_interfaces_.end(),
@@ -99,16 +105,19 @@ namespace perception_controller {
                 if(member->enable) {
                     RCLCPP_INFO(get_node()->get_logger(), "HERE!!!");
                     for(const auto & i : member->pub_raw) {
+                        i.second->on_activate();
                         threads_.emplace_back(
                             &PerceptionSystemController::worker_thread, 
                             this, member, idx, "image", i.first);         
                     }
                     for(const auto & i : member->pub_pose) {
+                        i.second->on_activate();
                         threads_.emplace_back(
                             &PerceptionSystemController::worker_thread, 
                             this, member, idx, "pose", i.first);         
                     }
                     for(const auto & i : member->pub_imu) {
+                        i.second->on_activate();
                         threads_.emplace_back(
                             &PerceptionSystemController::worker_thread, 
                             this, member, idx, "imu", i.first);         
@@ -168,28 +177,27 @@ namespace perception_controller {
         auto logger = get_node()->get_logger();
         uint64_t last_processed_timestamp = 0;
         
+        RCLCPP_INFO(logger, "worker_thread is running: %s, type: %s, topic: %s", 
+            member->name.c_str(), type.c_str(), topic.c_str());
+
         while(is_running_ && rclcpp::ok())
         {
             // get raw ptr
             double raw_val = state_interfaces_[interface_idx].get_value();
             uintptr_t ptr_address = static_cast<uintptr_t>(raw_val);
-            RCLCPP_INFO(logger, "Get raw ptr: %p, type: %s", 
-                reinterpret_cast<void*>(ptr_address), type.c_str());
+            // RCLCPP_INFO(logger, "Get raw ptr: %p, type: %s", 
+            //     reinterpret_cast<void*>(ptr_address), type.c_str());
 
-            if (ptr_address == 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                continue;
-            }
+            // if (ptr_address == 0) {
+            //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            //     continue;
+            // }
 
-            if(type == "image"){
-                RCLCPP_INFO(logger, "Pub image: %s, type: %s", topic.c_str(), type.c_str());
-            }
-            else if(type == "pose"){
-                RCLCPP_INFO(logger, "Pub pose: %s, type: %s", topic.c_str(), type.c_str());
-            }
-            else if(type == "imu"){
-                RCLCPP_INFO(logger, "Pub imu: %s, type: %s", topic.c_str(), type.c_str());
-            }
+            // dispatch
+            DeviceRegistry::dispatch(ptr_address, type, topic, member);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
         }
     }
 
