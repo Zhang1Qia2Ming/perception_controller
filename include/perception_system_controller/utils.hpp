@@ -31,15 +31,21 @@ class DeviceRegistry {
         )
         {
             if(member->device_type == "t265_camera") {
-                RCLCPP_DEBUG(
-                    rclcpp::get_logger("dispatch"),
-                    "dispatch t265 camera %s to %s",
-                    topic.c_str(),
-                    member->name.c_str()
-                );
+                // RCLCPP_INFO(
+                //     rclcpp::get_logger("dispatch_t265_camera"),
+                //     "dispatch t265 camera %s to %s",
+                //     topic.c_str(),
+                //     member->name.c_str()
+                // );
                 process_t265_camera(ptr, type, topic, member);
             }
             else if(member->device_type == "mock_camera") {
+                // RCLCPP_INFO(
+                //     rclcpp::get_logger("dispatch_mock_camera"),
+                //     "dispatch mock camera %s to %s",
+                //     topic.c_str(),
+                //     member->name.c_str()
+                // );
                 process_mock_camera(ptr, type, topic, member);
             }
         }
@@ -104,6 +110,7 @@ class DeviceRegistry {
             }
             else if(type == "image") {
                 //publish sensor_msgs::msg::Image
+                //distribute to left or right camera
                 bool is_left = (topic.find("left") != std::string::npos || topic.find("0") != std::string::npos);
                 auto& frame = is_left ? data->fisheye_left : data->fisheye_right;
 
@@ -133,11 +140,44 @@ class DeviceRegistry {
             std::shared_ptr<BaseMember> member
         )
         {
+            // return;
+            // RCLCPP_DEBUG(
+            //     rclcpp::get_logger("dispatch_mock_camera"),
+            //     "dispatch mock camera %s to %s",
+            //     topic.c_str(),
+            //     member->name.c_str()
+            // );
             auto* data = reinterpret_cast<perception_hardware::MockCameraData*>(ptr);
             if(data == nullptr) {
                 return;
             }
 
+            if(type == "image") {
+                //publish sensor_msgs::msg::Image
+                uint64_t current_ts = data->timestamp_nanos.load(std::memory_order_acquire);
+
+                if (current_ts <= member->last_ts[topic]) return;
+                member->last_ts[topic] = current_ts;
+
+                if(data->image.empty()){
+                    RCLCPP_INFO(
+                        rclcpp::get_logger("dispatch_mock_camera"),
+                        "mock camera %s timestamp %lu, image empty",
+                        topic.c_str(),
+                        current_ts
+                    );
+                    return;
+                } 
+                auto msg = cv_bridge::CvImage(
+                    std_msgs::msg::Header(),
+                    "bgr8",
+                    data->image
+                ).toImageMsg();
+                msg->header.stamp = rclcpp::Time(current_ts);
+                msg->header.frame_id = member->frame_id;
+
+                member->pub_raw[topic]->publish(*msg);
+            }
         }
 
 };
