@@ -84,27 +84,43 @@ class DeviceRegistry {
                 msg.angular_velocity.y = -data->imu.gyro[0];
                 msg.angular_velocity.z =  data->imu.gyro[1];
 
+                // add covariance
+                msg.linear_acceleration_covariance[0] = 1.e-6;
+                msg.linear_acceleration_covariance[4] = 1.e-6;
+                msg.linear_acceleration_covariance[8] = 1.e-6;
+
+                msg.angular_velocity_covariance[0] = 1.e-4;
+                msg.angular_velocity_covariance[4] = 1.e-4;
+                msg.angular_velocity_covariance[8] = 1.e-4;
+                
+                //if not set Quaternion, 
+                //set to -1 to indicate not available (ROS standard)
+                msg.orientation_covariance[0] = -1;
+
                 member->pub_imu[topic]->publish(msg);
             }
             else if(type == "pose") {
-                //publish nav_msgs::msg::Odometry
+                //publish geometry_msgs::msg::PoseStamped
                 uint64_t current_ts = data->pose.timestamp_nanos.load(std::memory_order_acquire);
 
                 if (current_ts <= member->last_ts[topic]) return;
                 member->last_ts[topic] = current_ts;
 
+                // PoseStamped structure:
+                //   position: x,y,z
+                //   orientation: x,y,z,w
                 auto msg = geometry_msgs::msg::PoseStamped();
                 msg.header.stamp = rclcpp::Time(current_ts);
                 msg.header.frame_id = "odom";
 
-                msg.pose.position.x = -data->pose.translation[0]; 
-                msg.pose.position.y = -data->pose.translation[1];
-                msg.pose.position.z =  data->pose.translation[2];
+                msg.pose.position.x = -data->pose.translation[2]; 
+                msg.pose.position.y = -data->pose.translation[0];
+                msg.pose.position.z =  data->pose.translation[1];
 
-                msg.pose.orientation.x = 0;
-                msg.pose.orientation.y = 1;
-                msg.pose.orientation.z = 2;
-                msg.pose.orientation.w = 3;
+                msg.pose.orientation.x = data->pose.rotation[2];
+                msg.pose.orientation.y = data->pose.rotation[0];
+                msg.pose.orientation.z = data->pose.rotation[1];
+                msg.pose.orientation.w = data->pose.rotation[3];
 
                 member->pub_pose[topic]->publish(msg);
             }
