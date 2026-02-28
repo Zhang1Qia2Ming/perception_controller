@@ -70,19 +70,23 @@ class DeviceRegistry {
                 if (current_ts <= member->last_ts[topic]) return;
                 member->last_ts[topic] = current_ts;
 
+                double accel_snap[3], gyro_snap[3];
+                std::memcpy(accel_snap, data->imu.accel, sizeof(accel_snap));
+                std::memcpy(gyro_snap, data->imu.gyro, sizeof(gyro_snap));
+
                 auto msg = sensor_msgs::msg::Imu();
                 msg.header.stamp = rclcpp::Time(current_ts);
                 msg.header.frame_id = member->frame_id;
 
                 // map T265 Left-Hand -> ROS Right-Hand REP-103
                 // ROS_X = -T265_Z, ROS_Y = -T265_X, ROS_Z = T265_Y
-                msg.linear_acceleration.x = -data->imu.accel[2]; 
-                msg.linear_acceleration.y = -data->imu.accel[0];
-                msg.linear_acceleration.z =  data->imu.accel[1];
+                msg.linear_acceleration.x = -accel_snap[2]; 
+                msg.linear_acceleration.y = -accel_snap[0];
+                msg.linear_acceleration.z =  accel_snap[1];
 
-                msg.angular_velocity.x = -data->imu.gyro[2];
-                msg.angular_velocity.y = -data->imu.gyro[0];
-                msg.angular_velocity.z =  data->imu.gyro[1];
+                msg.angular_velocity.x = -gyro_snap[2];
+                msg.angular_velocity.y = -gyro_snap[0];
+                msg.angular_velocity.z =  gyro_snap[1];
 
                 // add covariance
                 msg.linear_acceleration_covariance[0] = 1.e-6;
@@ -106,6 +110,9 @@ class DeviceRegistry {
                 if (current_ts <= member->last_ts[topic]) return;
                 member->last_ts[topic] = current_ts;
 
+                double translation_snap[3], rotation_snap[4];
+                std::memcpy(translation_snap, data->pose.translation, sizeof(translation_snap));
+                std::memcpy(rotation_snap, data->pose.rotation, sizeof(rotation_snap));
                 // PoseStamped structure:
                 //   position: x,y,z
                 //   orientation: x,y,z,w
@@ -113,14 +120,14 @@ class DeviceRegistry {
                 msg.header.stamp = rclcpp::Time(current_ts);
                 msg.header.frame_id = "odom";
 
-                msg.pose.position.x = -data->pose.translation[2]; 
-                msg.pose.position.y = -data->pose.translation[0];
-                msg.pose.position.z =  data->pose.translation[1];
+                msg.pose.position.x = -translation_snap[2]; 
+                msg.pose.position.y = -translation_snap[0];
+                msg.pose.position.z =  translation_snap[1];
 
-                msg.pose.orientation.x = data->pose.rotation[2];
-                msg.pose.orientation.y = data->pose.rotation[0];
-                msg.pose.orientation.z = data->pose.rotation[1];
-                msg.pose.orientation.w = data->pose.rotation[3];
+                msg.pose.orientation.x = rotation_snap[2];
+                msg.pose.orientation.y = rotation_snap[0];
+                msg.pose.orientation.z = rotation_snap[1];
+                msg.pose.orientation.w = rotation_snap[3];
 
                 member->pub_pose[topic]->publish(msg);
             }
@@ -136,11 +143,13 @@ class DeviceRegistry {
                 member->last_ts[topic] = current_ts;
 
                 if(frame.image.empty()) return;
-                
+
+                cv::Mat frame_snap = frame.image.clone();
+
                 auto msg = cv_bridge::CvImage(
                     std_msgs::msg::Header(),
                     "mono8",
-                    frame.image
+                    frame_snap
                 ).toImageMsg();
                 msg->header.stamp = rclcpp::Time(current_ts);
                 msg->header.frame_id = member->frame_id;
@@ -183,11 +192,13 @@ class DeviceRegistry {
                         current_ts
                     );
                     return;
-                } 
+                }
+                cv::Mat frame_snap = data->image.clone();
+                
                 auto msg = cv_bridge::CvImage(
                     std_msgs::msg::Header(),
                     "bgr8",
-                    data->image
+                    frame_snap
                 ).toImageMsg();
                 msg->header.stamp = rclcpp::Time(current_ts);
                 msg->header.frame_id = member->frame_id;

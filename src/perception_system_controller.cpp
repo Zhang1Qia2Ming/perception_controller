@@ -192,11 +192,12 @@ namespace perception_controller {
         auto logger = get_node()->get_logger();
         uint64_t last_processed_timestamp = 0;
         
-        RCLCPP_INFO(logger, "worker_thread is running: %s, type: %s, topic: %s", 
+        RCLCPP_INFO(logger, "worker_thread(event-driven) is running: %s, type: %s, topic: %s", 
             member->name.c_str(), type.c_str(), topic.c_str());
 
         while(is_running_ && rclcpp::ok())
         {
+            
             // get raw ptr
             double raw_val = state_interfaces_[interface_idx].get_value();
             uintptr_t ptr_address = static_cast<uintptr_t>(raw_val);
@@ -208,10 +209,11 @@ namespace perception_controller {
             //     continue;
             // }
 
+
             // dispatch
             DeviceRegistry::dispatch(ptr_address, type, topic, member);
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            // std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         }
     }
