@@ -144,13 +144,20 @@ class DeviceRegistry {
 
                 if(frame.image.empty()) return;
 
-                cv::Mat frame_snap = frame.image.clone();
+                // cv::Mat frame_snap = frame.image.clone();
+
+                // auto msg = cv_bridge::CvImage(
+                //     std_msgs::msg::Header(),
+                //     "mono8",
+                //     frame_snap
+                // ).toImageMsg();
 
                 auto msg = cv_bridge::CvImage(
                     std_msgs::msg::Header(),
                     "mono8",
-                    frame_snap
+                    frame.image
                 ).toImageMsg();
+
                 msg->header.stamp = rclcpp::Time(current_ts);
                 msg->header.frame_id = member->frame_id;
 
@@ -193,12 +200,18 @@ class DeviceRegistry {
                     );
                     return;
                 }
-                cv::Mat frame_snap = data->image.clone();
+                // cv::Mat frame_snap = data->image.clone();
                 
+                // auto msg = cv_bridge::CvImage(
+                //     std_msgs::msg::Header(),
+                //     "bgr8",
+                //     frame_snap
+                // ).toImageMsg();
+
                 auto msg = cv_bridge::CvImage(
                     std_msgs::msg::Header(),
                     "bgr8",
-                    frame_snap
+                    data->image
                 ).toImageMsg();
                 msg->header.stamp = rclcpp::Time(current_ts);
                 msg->header.frame_id = member->frame_id;
