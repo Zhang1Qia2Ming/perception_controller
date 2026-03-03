@@ -47,11 +47,11 @@ class TestMockCameraController : public controller_interface::ControllerInterfac
 
         // RCLCPP_INFO(get_node()->get_logger(), "Restored Buffer: %p", (void*)(mock_camera_data->image.data));
 
-        if(!mock_camera_data || mock_camera_data->image.empty()) {
+        if(!mock_camera_data || mock_camera_data->frame.image.empty()) {
           continue;
         }
 
-        uint64_t hw_time = mock_camera_data->timestamp_nanos;
+        uint64_t hw_time = mock_camera_data->frame.timestamp_nanos;
         auto now = get_node()->now().nanoseconds();
         RCLCPP_INFO(get_node()->get_logger(), "Time Delay: %ld ns", now - hw_time);
 
@@ -64,9 +64,9 @@ class TestMockCameraController : public controller_interface::ControllerInterfac
         }
 
         //publish image ros2 message
-        auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", mock_camera_data->image).toImageMsg();
+        auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", mock_camera_data->frame.image).toImageMsg();
         msg->header.stamp = get_node()->now();
-        msg->header.frame_id = mock_camera_data->frame_id;
+        msg->header.frame_id = mock_camera_data->frame.frame_id;
         image_publishers_[camera_name]->publish(*msg);
       }
     }

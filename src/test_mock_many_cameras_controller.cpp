@@ -56,14 +56,14 @@ class TestMockManyCamerasController : public controller_interface::ControllerInt
 
           auto* mock_camera_data = reinterpret_cast<perception_hardware::MockCameraData*>(addr);
 
-          if(!mock_camera_data || mock_camera_data->image.empty()) {
+          if(!mock_camera_data || mock_camera_data->frame.image.empty()) {
             continue;
           }
 
           try {
-            auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", mock_camera_data->image).toImageMsg();
+            auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", mock_camera_data->frame.image).toImageMsg();
               msg->header.stamp = get_node()->now();
-              msg->header.frame_id = mock_camera_data->frame_id;
+              msg->header.frame_id = mock_camera_data->frame.frame_id;
               
               if(image_publishers_.count(camera_name)) {
                 image_publishers_[camera_name]->publish(*msg);      
@@ -73,14 +73,6 @@ class TestMockManyCamerasController : public controller_interface::ControllerInt
             RCLCPP_ERROR(get_node()->get_logger(), "Publish image exception: %s", e.what());
           }
         }
-
-
-        
-        // auto* mock_camera_data = reinterpret_cast<perception_hardware::MockCameraData*>(task.addr);
-        // auto msg = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", mock_camera_data->image).toImageMsg();
-        // msg->header.stamp = get_node()->now();
-        // msg->header.frame_id = mock_camera_data->frame_id;
-        // image_publishers_[task.camera_name]->publish(*msg);
 
       }
     }

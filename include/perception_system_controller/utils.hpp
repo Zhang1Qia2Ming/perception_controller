@@ -186,12 +186,12 @@ class DeviceRegistry {
 
             if(type == "image") {
                 //publish sensor_msgs::msg::Image
-                uint64_t current_ts = data->timestamp_nanos.load(std::memory_order_acquire);
+                uint64_t current_ts = data->frame.timestamp_nanos.load(std::memory_order_acquire);
 
                 if (current_ts <= member->last_ts[topic]) return;
                 member->last_ts[topic] = current_ts;
 
-                if(data->image.empty()){
+                if(data->frame.image.empty()){
                     RCLCPP_INFO(
                         rclcpp::get_logger("dispatch_mock_camera"),
                         "mock camera %s timestamp %lu, image empty",
@@ -200,7 +200,7 @@ class DeviceRegistry {
                     );
                     return;
                 }
-                // cv::Mat frame_snap = data->image.clone();
+                // cv::Mat frame_snap = data->frame.image.clone();
                 
                 // auto msg = cv_bridge::CvImage(
                 //     std_msgs::msg::Header(),
@@ -211,7 +211,7 @@ class DeviceRegistry {
                 auto msg = cv_bridge::CvImage(
                     std_msgs::msg::Header(),
                     "bgr8",
-                    data->image
+                    data->frame.image
                 ).toImageMsg();
                 msg->header.stamp = rclcpp::Time(current_ts);
                 msg->header.frame_id = member->frame_id;
