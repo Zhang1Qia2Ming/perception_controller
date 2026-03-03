@@ -24,6 +24,11 @@ generate_parameter_library(
   src/perception_system_controller_params.yaml
 )
 
+generate_parameter_library(
+  perception_pub_controller_params_lib
+  src/perception_pub_controller_params.yaml
+)
+
 # 3. 编译 Controller 库
 add_library(${PROJECT_NAME} SHARED
   src/perception_system_controller.cpp
@@ -32,10 +37,13 @@ add_library(${PROJECT_NAME} SHARED
   src/test_mock_camera_controller.cpp
   src/test_mock_many_cameras_controller.cpp
   src/test_t265_camera_controller.cpp
+  src/perception_pub_controller.cpp
 )
 
 # 4. 【关键】建立显式依赖，确保头文件先生成
 add_dependencies(${PROJECT_NAME} perception_system_controller_params_lib)
+add_dependencies(${PROJECT_NAME} perception_pub_controller_params_lib)
+
 
 # 5. 【关键】包含生成头文件的路径
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -60,6 +68,7 @@ ament_target_dependencies(${PROJECT_NAME}
 
 # 7. 链接参数库 target
 target_link_libraries(${PROJECT_NAME} perception_system_controller_params_lib)
+target_link_libraries(${PROJECT_NAME} perception_pub_controller_params_lib)
 
 # 8. 导出插件描述文件
 pluginlib_export_plugin_description_file(

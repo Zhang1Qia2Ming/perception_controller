@@ -1,0 +1,12 @@
+perception_pub_controller:
+  pub_list:
+    type: string_array
+    default_value: ["t265_front/fisheye0", "camera_front/image_raw","t265_front/pose"]
+    description: "List of device names"
+
+
+  members:
+    __map_pub_list:
+      enable:
+        type: bool
+        default_value: true
